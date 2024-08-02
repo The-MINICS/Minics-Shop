@@ -1,0 +1,58 @@
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  email         String   @unique
+  fist_name     String
+  last_name     String
+  image_profile String
+  transaction   Transaction[]
+  review        Review[]
+  address       Address?
+}
+
+model Product {
+  id            String    @id @default(auto()) @map("_id") @db.ObjectId
+  name          String
+  image_product String
+  price         Float
+  details       String?
+  stock         Int
+  reviews       Review[]
+}
+
+model Review {
+  id           String @id @default(auto()) @map("_id") @db.ObjectId
+  review       String
+  rating       Int
+  image_review String
+  user         User      @relation(fields: [userId], references: [id])
+  userId       String    @db.ObjectId
+  product      Product @relation(fields: [productId], references: [id])
+  productId    String @db.ObjectId
+}
+
+model Transaction {
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  productId String    @db.ObjectId
+  quantity  Int
+  status    Int
+  address   Address
+  user      User      @relation(fields: [userId], references: [id])
+  userId    String    @db.ObjectId
+}
+
+// Address is an embedded document
+type Address {
+  street String
+  city   String
+  state  String
+  zip    String
+}
